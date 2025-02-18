@@ -47,7 +47,7 @@ tasks:
     labels:
       year: "{{inputs.year}}"
 
-  - id: python_task
+  - id: download_price_paid
     type: io.kestra.plugin.scripts.python.Commands
     namespaceFiles:
       enabled: true
