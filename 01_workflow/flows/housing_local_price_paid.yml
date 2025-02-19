@@ -57,3 +57,41 @@ tasks:
       - python src/get_price_paid.py --file_name={{render(vars.file_name)}}.csv --base_url={{secret('PRICE_PAID_BASE_URL')}} --is_kestra
     outputFiles:
       - "*.csv"
+  
+  - id: to_parquet
+    type: io.kestra.plugin.scripts.python.Script
+    warningOnStdErr: false
+    containerImage: ghcr.io/kestra-io/pydata:latest
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    env:
+      FILE_NAME: "{{ render(vars.file_name) }}"
+    inputFiles: "{{ outputs.download_price_paid.outputFiles }}"
+    script: |
+      import os
+      import pandas as pd
+
+      file_name = os.environ["FILE_NAME"]
+      file = f"{file_name}.csv"
+      columns=[
+        "transaction_uid",
+        "price",
+        "date_of_transfer",
+        "postcode",
+        "property_type",
+        "is_new_build",
+        "tenure_duration",
+        "paon",
+        "saon",
+        "street",
+        "locality",
+        "town_city",
+        "district",
+        "county",
+        "transaction_type",
+        "record_status",
+      ]
+      df = pd.read_csv(file, names=columns)
+      df.to_parquet(f"{file_name}.parquet")
+    outputFiles:
+      - "*.parquet"
