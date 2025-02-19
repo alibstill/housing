@@ -54,6 +54,6 @@ tasks:
     beforeCommands:
       - pip install -r requirements.txt
     commands:
-      - python src/get_price_paid.py --file_name={{render(vars.file_name)}}.csv --base_url={{secret('PRICE_PAID_BASE_URL')}}
+      - python src/get_price_paid.py --file_name={{render(vars.file_name)}}.csv --base_url={{secret('PRICE_PAID_BASE_URL')}} --is_kestra
     outputFiles:
       - "*.csv"

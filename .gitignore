@@ -3,6 +3,7 @@ learning/**
 log/**
 
 **/.ipynb_checkpoints/**
+**/__pycache__/**
 
 # 01_workflow
 01_workflow/.env
@@ -11,4 +12,5 @@ log/**
 01_workflow/scripts/.venv/**
 01_workflow/kestra-data/** 
 01_workflow/.tmp/**
+01_workflow/scripts/src/temp/**
 
