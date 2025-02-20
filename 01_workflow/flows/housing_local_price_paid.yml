@@ -49,6 +49,7 @@ tasks:
 
   - id: download_price_paid
     type: io.kestra.plugin.scripts.python.Commands
+    containerImage: ghcr.io/kestra-io/pydata:latest # need for pyarrow
     namespaceFiles:
       enabled: true
     beforeCommands:
