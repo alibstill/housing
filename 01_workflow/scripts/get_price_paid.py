@@ -2,7 +2,7 @@ import argparse
 import logging
 import kestra
 
-from download_save_file import get_file
+from src.download_save_file import get_file
 
 
 def get_price_paid():
@@ -15,7 +15,7 @@ def get_price_paid():
     )
     parser.add_argument(
         "--is_kestra",
-        help="the part of the url before the final file_name eg. 'http://url.com/",
+        help="use this flag if this script is running in Kestra",
         required=False,
         default=False,
         action=argparse.BooleanOptionalAction,
