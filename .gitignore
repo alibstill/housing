@@ -17,3 +17,20 @@ log/**
 01_workflow/.tmp/**
 01_workflow/scripts/src/temp/**
 
+# infrastructure
+infrastructure/.credentials/**
+infrastructure/scripts/.venv
+
+# This file is created automatically
+infrastructure/backend.tf 
+
+# Local .terraform directories
+infrastructure/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# there is debate about whether this should be added to .gitignore
+.terraform.lock.hcl
+

@@ -1,6 +1,6 @@
 # Google Cloud Platform Initial setup
 
-Before deploying any infrastructure with terraform you will need to setup your google account with billing, download terraform and `gcloud` (Google Cloud's CLI) and create a service account for terraform  
+Before deploying any infrastructure with terraform you will need to setup your google account with billing, download terraform and `gcloud` (Google Cloud's CLI) and create a service account for terraform.  
 
 ## Create a project on the console
 
@@ -48,6 +48,7 @@ These configurations are likely stored in `.config/gcloud/configurations` but yo
 - help with config: `gcloud help config`
 - details of configurations: `gcloud topic configurations`
 - useful commands: `gcloud cheat-sheet`
+- list all your configurations: `gcloud config configurations list`
 
 ### Logging in to gcloud
 
@@ -68,7 +69,7 @@ As a dev, you can now use the CLI to run gcloud commands from your terminal. The
 
 1. Install terraform
 
-You can find details of the terraform website. We are using v1.9.6.
+You can find details of the terraform website. We are using v1.10.5.
 
 ```bash
 brew tap hashicorp/tap
@@ -96,6 +97,8 @@ gcloud iam service-accounts create sa-dezc-housing-tf-dev \
 --display-name="DEV Terraform Service Account"
 ```
 
+Navigate to your GCP console > project > IAM & Admin > Service Accounts and you should see a new service account with email `sa-dezc-housing-tf-dev@dezc-housing.iam.gserviceaccount.co
+
 4. Add roles and permissions for the service account
 
 This command adds IAM policy bindings at the project level. Here we are using it to grant a role to the new service account we have just created. Note that we are giving broad access here, which is not ideal or best practice.
@@ -104,19 +107,65 @@ This command adds IAM policy bindings at the project level. Here we are using it
 gcloud projects add-iam-policy-binding PROJECT_ID \
 --member="serviceAccount:sa-dezc-housing-tf-dev@{PROJECT_ID}.iam.gserviceaccount.com" \
 --role="roles/editor"
+
+gcloud projects add-iam-policy-binding dezc-housing \
+--member="serviceAccount:sa-dezc-housing-tf-dev@dezc-housing.iam.gserviceaccount.com" \
+--role="roles/editor"
 ```
+
+Now if you navigate to GCP console > project > IAM & Admin > IAM, you will see two Prinicipals, you and the terraform service account. You have owner access while the terraform account has editor access.
 
 5. Generate and download keys for your service account
 
 It is not ideal to have static keys like this but this is a simpler approach so we will use it for now.
 
 ```bash
+# update path and project id
 gcloud iam service-accounts keys create ~/path/to/key.json \
-  --iam-account=your-service-account@your-project-id.iam.gserviceaccount.com
+  --iam-account=your-service-account@{PROJECT_ID}.iam.gserviceaccount.com
+
+gcloud iam service-accounts keys create ./infrastructure/.credentials/tf-dev.json \
+  --iam-account=sa-dezc-housing-tf-dev@dezc-housing.iam.gserviceaccount.com
 ```
 
-## A note on this approach
+6. Create the remote backend (optional)
 
-Since this project is a demo project I have built resources in my own google account to limit costs and complexity. 
+Terraform state is stored locally but I wanted to try storing it in a remote backend for practice e.g. in a Google Cloud Storage bucket. This involves creating a bucket in GCS and updating the terraform configuration with its name:
 
-If you wanted to create resources for an organisation and manage users more effectively, you would need to have a Google Workspace (paid service) or Cloud Identity (requires a domain). See [Resource Hiearchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy#resource-hierarchy-detail).
+```
+terraform {
+  # add this backend section
+  backend "gcs" {
+    bucket = "960e97d6ed3a95bd-terraform-remote-backend"  
+  }
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "6.23.0"
+    }
+  }
+}
+```
+
+**Creating a bucket: Manual approach**
+
+The simplest way to do this is to manually create a bucket. Navigate to your GCP console > project > Cloud Storage > Buckets. The defaults are fine but I opted to have buckets in a single region:
+
+- Location: choose the region where you are hosting your project e.g. "europe-west2".
+
+You need to copy the name of the bucket and update the `terraform` block.
+
+**Script**
+
+You can also use the script in the [scripts folder](../scripts/) to create the bucket. It will output the name of the newly created bucket which you can then use to update the `terraform` block.
+
+
+**Deletion**
+
+If you are destroying the whole project, remember to delete this bucket too!
+
+## A note on overall approach
+
+Since this project is a demo project I have built resources in my own google account to limit costs and complexity. User management options in particular are constrained and not ideal for a professional context: you will notice  if you navigate to IAM & Admin, you will notice how many features expect an `organization`.
+
+If you wanted to create resources for an organisation and manage users more effectively, you would need to have a Google Workspace (paid service) or Cloud Identity (requires a domain). See [Resource Hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy#resource-hierarchy-detail).
