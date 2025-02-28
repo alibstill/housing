@@ -4,9 +4,9 @@ This folder contains scripts and configuration required to run Kestra workflows.
 
 ## Workflow Descriptions
 
-### Local Postgres: price_paid
+### Download price paid to local Postgres
 
-- kestra workflow: `flows/local_og_pri
+- kestra workflow: `flows/local_pg_price_paid.yml`
 
 This workflow downloads a csv file of a years worth of Price Paid data and uploads it to a local postgres database.
 
@@ -21,6 +21,15 @@ docker-compose up -d
 Kestra is available at: http://localhost:8080/
 
 PgAdmin is available at: http://localhost:8085/
+
+### Manual Configuration
+
+1. Adding files to Namespace
+
+The flows make use of some Python [scripts](./scripts/). We need to manually add these files to Kestra.
+
+Navigate to the locally running kestra `Namespaces` (http://localhost:8080/ui/namespaces). Select `housing_local`. Go to `Files` and click on the plus icon to import the `scripts` folder and all its files.
+
 
 ### Configuring PgAdmin
 This docker-compose.yml contains a PgAdmin instance to make it easier to view your housing database.

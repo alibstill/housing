@@ -14,6 +14,14 @@ You can then navigate to the dashboard. In Project Info you will see your Projec
 
 For more details see [google docs](https://cloud.google.com/docs/overview).
 
+## Enable APIs
+
+Navigate to APIs & Services > Enabled APIs & Services on your console after creating your project and you will notice that some are already enabled by default [see docs](https://cloud.google.com/service-usage/docs/enabled-service).
+
+To allow Terraform to create a service account for Kestra and provide it with permissions, you need to also enable:
+
+- `iam.googleapis.com`: Identity and Access Management (IAM) API
+- `cloudresourcemanager.googleapis.com`: Cloud Resource Manager API
 
 ## CLI configuration
 
@@ -103,17 +111,25 @@ Navigate to your GCP console > project > IAM & Admin > Service Accounts and you 
 
 This command adds IAM policy bindings at the project level. Here we are using it to grant a role to the new service account we have just created. Note that we are giving broad access here, which is not ideal or best practice.
 
+This `editor` role allows you to create and delete resources for most cloud services but it doesn't allow you to set up the Kestra service account and assign it permissions so you need to give terraform the `resourcemanager.projectIamAdmin` role too.
+
 ```bash
+## general
 gcloud projects add-iam-policy-binding PROJECT_ID \
 --member="serviceAccount:sa-dezc-housing-tf-dev@{PROJECT_ID}.iam.gserviceaccount.com" \
 --role="roles/editor"
 
+## specific
 gcloud projects add-iam-policy-binding dezc-housing \
 --member="serviceAccount:sa-dezc-housing-tf-dev@dezc-housing.iam.gserviceaccount.com" \
 --role="roles/editor"
+
+gcloud projects add-iam-policy-binding dezc-housing \
+--member="serviceAccount:sa-dezc-housing-tf-dev@dezc-housing.iam.gserviceaccount.com" \
+--role="roles/resourcemanager.projectIamAdmin"
 ```
 
-Now if you navigate to GCP console > project > IAM & Admin > IAM, you will see two Prinicipals, you and the terraform service account. You have owner access while the terraform account has editor access.
+Now if you navigate to GCP console > project > IAM & Admin > IAM, you will see two Prinicipals, you and the terraform service account. You have owner access while the terraform account has editor and projectIamAdmin access.
 
 5. Generate and download keys for your service account
 
@@ -164,8 +180,22 @@ You can also use the script in the [scripts folder](../scripts/) to create the b
 
 If you are destroying the whole project, remember to delete this bucket too!
 
+## Getting credentials for other service accounts
+
+### Kestra/ Workflow
+I have created the workflow (Kestra) service account with terraform. 
+
+After you have completed the steps above to create the infrastructure on GCP, you can run the following to save the kestra GCP credentials to the workflow directory.
+
+```bash
+# update path and project id
+gcloud iam service-accounts keys create ../01_workflow/.credentials/kestra-dev.json \
+  --iam-account=sa-dezc-housing-kestra-dev@dezc-housing.iam.gserviceaccount.com
+```
+
+
 ## A note on overall approach
 
-Since this project is a demo project I have built resources in my own google account to limit costs and complexity. User management options in particular are constrained and not ideal for a professional context: you will notice  if you navigate to IAM & Admin, you will notice how many features expect an `organization`.
+Since this project is a demo project I have built resources in my own google account to limit costs and complexity. User management options in particular are constrained and not ideal for a professional context: you will notice  if you navigate to IAM & Admin how many features expect an `organization`.
 
 If you wanted to create resources for an organisation and manage users more effectively, you would need to have a Google Workspace (paid service) or Cloud Identity (requires a domain). See [Resource Hierarchy](https://cloud.google.com/resource-manager/docs/cloud-platform-resource-hierarchy#resource-hierarchy-detail).

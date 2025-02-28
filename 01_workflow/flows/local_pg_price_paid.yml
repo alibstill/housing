@@ -54,9 +54,9 @@ tasks:
     namespaceFiles:
       enabled: true
     beforeCommands:
-      - pip install -r requirements.txt
+      - pip install -r ./scripts/requirements.txt
     commands:
-      - python get_price_paid.py --file_name={{render(vars.file_name)}}.csv --base_url={{secret('PRICE_PAID_BASE_URL')}} --is_kestra
+      - python ./scripts/get_price_paid.py --file_name={{render(vars.file_name)}}.csv --base_url={{secret('PRICE_PAID_BASE_URL')}} --is_kestra
     outputFiles:
       - "*.csv"
 

@@ -53,9 +53,9 @@ tasks:
     namespaceFiles:
       enabled: true
     beforeCommands:
-      - pip install -r requirements.txt
+      - pip install -r ./scripts/requirements.txt
     commands:
-      - python get_price_paid.py --file_name={{render(vars.file_name)}}.csv --base_url={{secret('PRICE_PAID_BASE_URL')}} --is_kestra
+      - python ./scripts/get_price_paid.py --file_name={{render(vars.file_name)}}.csv --base_url={{secret('PRICE_PAID_BASE_URL')}} --is_kestra
     outputFiles:
       - "*.csv"
 
@@ -65,12 +65,12 @@ tasks:
     namespaceFiles:
       enabled: true
     beforeCommands:
-      - pip install -r requirements.txt
+      - pip install -r ./scripts/requirements.txt
     taskRunner:
       type: io.kestra.plugin.scripts.runner.docker.Docker
     inputFiles: "{{ outputs.download_price_paid.outputFiles }}"
     commands:
-      - python csv_to_pq.py --src_file_name={{render(vars.file_name) }} --is_kestra
+      - python ./scripts/csv_to_pq.py --src_file_name={{render(vars.file_name) }} --is_kestra
     outputFiles:
       - "*.parquet"
   # - id: to_parquet
