@@ -1,4 +1,4 @@
-id: price_paid
+id: price_paid_old
 namespace: housing_local
 
 inputs:

@@ -1,4 +1,4 @@
-id: local_pg_price_paid
+id: pg_price_paid
 namespace: housing_local
 
 inputs:
