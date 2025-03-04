@@ -15,4 +15,27 @@ provider "google" {
   region  = var.region
 }
 
+resource "google_storage_bucket" "raw" {
+  name                        = "${var.project_id}-raw"
+  location                    = var.region
+  force_destroy               = true
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  # It's possible that we may not be able to completely upload a 
+  # file due to network issues, timeouts etc.
+  # We will want to make sure that we delete any files that are incomplete. 
+  # In our configuration we set `age` to be 1, which means GCS will delete 
+  # an incomplete file 1 day after we first try to upload it.
+  lifecycle_rule {
+    condition {
+      age = 1
+    }
+    action {
+      type = "AbortIncompleteMultipartUpload"
+    }
+  }
+}
+
+
 
