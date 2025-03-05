@@ -83,7 +83,7 @@ Note that port, username and password must match the configurations specified in
 
 In addition to adding files to the Namespace and setting up the environment variables, you will also need to ensure that you have uploaded your google cloud credentials to kestra's key/value store.
 
-Remember, before you can run this pipeline, you must have setup your Google Cloud Platform (GCP) project and downloaded the credentials of the kestra service account created by terraform. See [Infrastructure](../infrastructure/notes/).
+Remember, before you can run this pipeline, you must have setup your Google Cloud Platform (GCP) project and downloaded the credentials of the kestra service account created by terraform. See [Infrastructure](../infrastructure/notes/). 
 
 ### Adding Credentials to key/value store
 

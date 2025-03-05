@@ -5,7 +5,7 @@ inputs:
   - id: year
     type: SELECT
     displayName: "year"
-    defaults: "2024"
+    defaults: "2025"
     values:
       - "1995"
       - "1996"
@@ -37,11 +37,14 @@ inputs:
       - "2022"
       - "2023"
       - "2024"
+      - "2025"
 
 variables:
   file_name: "pp-{{inputs.year}}"
-  data: "{{outputs.download_price_paid.outputFiles['pp-' ~ inputs.year ~ '.csv']}}"
-  gcs_file_path: "gs://{{secret('GCP_RAW_BUCKET_NAME')}}/{{vars.file_name}}.csv"
+  csv_data: "{{outputs.download_price_paid.outputFiles['pp-' ~ inputs.year ~ '.csv']}}"
+  gcs_raw_file_path: "gs://{{secret('GCP_RAW_BUCKET_NAME')}}/landregistry_price_paid/{{vars.file_name}}.csv"
+  parquet_data: "{{outputs.transform_price_paid.outputFiles['pp-' ~ inputs.year ~ '.parquet']}}"
+  gcs_processed_file_path: "gs://{{secret('GCP_PROCESSED_BUCKET_NAME')}}/landregistry_price_paid/{{vars.file_name}}.parquet"
 
 tasks:
   - id: set_label
@@ -61,10 +64,28 @@ tasks:
     outputFiles:
       - "*.csv"
 
-  - id: upload_gcs
+  - id: upload_csv_gcs
     type: io.kestra.plugin.gcp.gcs.Upload
-    from: "{{render(vars.data)}}"
-    to: "{{render(vars.gcs_file_path)}}"
+    from: "{{render(vars.csv_data)}}"
+    to: "{{render(vars.gcs_raw_file_path)}}"
+
+  - id: transform_price_paid
+    type: io.kestra.plugin.scripts.python.Commands
+    containerImage: ghcr.io/kestra-io/pydata:latest # need for pyarrow
+    namespaceFiles:
+      enabled: true
+    inputFiles: "{{ outputs.download_price_paid.outputFiles }}"
+    beforeCommands:
+      - pip install -r ./scripts/requirements.txt
+    commands:
+      - python ./scripts/process_csv.py --src_file_name={{render(vars.file_name)}} --is_kestra
+    outputFiles:
+      - "*.parquet"
+
+  - id: upload_parquet_gcs
+    type: io.kestra.plugin.gcp.gcs.Upload
+    from: "{{render(vars.parquet_data)}}"
+    to: "{{render(vars.gcs_processed_file_path)}}"
 
 pluginDefaults:
   - type: io.kestra.plugin.gcp
