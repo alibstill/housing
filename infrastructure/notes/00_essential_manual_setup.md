@@ -188,6 +188,8 @@ I have created the workflow (Kestra) service account with terraform.
 After you have completed the steps above to create the infrastructure on GCP, you can run the following to save the kestra GCP credentials to the workflow directory.
 
 ```bash
+gcloud auth login
+
 # update path and project id
 gcloud iam service-accounts keys create ../01_workflow/.credentials/kestra-dev.json \
   --iam-account=sa-dezc-housing-kestra-dev@dezc-housing.iam.gserviceaccount.com

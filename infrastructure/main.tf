@@ -15,8 +15,9 @@ provider "google" {
   region  = var.region
 }
 
-resource "google_storage_bucket" "raw" {
-  name                        = "${var.project_id}-raw"
+resource "google_storage_bucket" "default" {
+  for_each                    = var.storage_bucket_names
+  name                        = "${var.project_id}-${each.value}"
   location                    = var.region
   force_destroy               = true
   uniform_bucket_level_access = true

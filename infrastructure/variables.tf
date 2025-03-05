@@ -9,3 +9,9 @@ variable "region" {
   type        = string
   default     = "EUROPE-WEST2" # London, this is a low CO2 region 
 }
+
+variable "storage_bucket_names" {
+  description = "The names of the storage buckets"
+  type        = set(string)
+  default     = ["raw", "processed"]
+}
