@@ -38,5 +38,12 @@ resource "google_storage_bucket" "default" {
   }
 }
 
+resource "google_bigquery_dataset" "housing" {
+  dataset_id = "housing"
+  # the default is the US, it is vital you set this to your region 
+  # otherwise you won't be able to query data
+  location                   = var.region
+  delete_contents_on_destroy = true # while developing set to true
+}
 
 

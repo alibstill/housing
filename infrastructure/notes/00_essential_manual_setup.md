@@ -195,6 +195,19 @@ gcloud iam service-accounts keys create ../01_workflow/.credentials/kestra-dev.j
   --iam-account=sa-dezc-housing-kestra-dev@dezc-housing.iam.gserviceaccount.com
 ```
 
+### Dbt
+I have created a dbt service account with terraform. 
+
+After you have completed the steps above to create the infrastructure on GCP, you can run the following to save the dbt GCP credentials to the workflow directory.
+
+```bash
+gcloud auth login
+
+# update path and project id
+gcloud iam service-accounts keys create ../02_analytics/.credentials/dbt-dev.json \
+  --iam-account=sa-dezc-housing-dbt-dev@dezc-housing.iam.gserviceaccount.com
+```
+
 
 ## A note on overall approach
 
