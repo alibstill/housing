@@ -8,7 +8,7 @@ If run locally, it will download files from a url and save them to a `temp` fold
 For an overview of the inputs, use the help function:
 
 ```bash
-sourc .venv/bin/activate
+source .venv/bin/activate
 python ./get_price_paid.py --help
 ```
 
