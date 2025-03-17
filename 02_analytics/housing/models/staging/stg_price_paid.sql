@@ -1,24 +1,23 @@
-with raw_price_paid as (
-    select * from {{ source('land_registry', 'price_paid') }}
+WITH raw_price_paid AS (
+    SELECT * FROM {{ source('land_registry', 'price_paid') }}
 )
 
-select 
-   CAST(transaction_uid, AS STRING),
-   CAST(price AS INT64),
-   CAST(date_of_transfer AS DATE),
-   CAST(postcode AS STRING),
-   CAST(property_type AS STRING),
-   CAST(is_new_build AS STRING),
-   CAST(tenure_duration AS STRING),
-   CAST(paon AS STRING),
-   CAST(saon AS STRING),
-   CAST(street AS STRING),
-   CAST(locality AS STRING),
-   CAST(town_city AS STRING),
-   CAST(district AS STRING),
-   CAST(county AS STRING),
-   CAST(transaction_type AS STRING),
-   CAST(record_status AS STRING),
-   CAST(location_hash AS STRING)
- 
-from raw_price_paid
+SELECT 
+   CAST(transaction_uid AS STRING) AS transaction_uid,
+   CAST(price AS INT64) AS price,
+   CAST(LEFT(date_of_transfer, 10) AS DATE) As date_of_transfer, --BQ does not support \d
+   CAST(postcode AS STRING) AS postcode,
+   CAST(property_type AS STRING) AS property_type,
+   CAST(is_new_build AS STRING) AS is_new_build,
+   CAST(tenure_duration AS STRING) AS tenure_duration,
+   CAST(paon AS STRING) AS paon,
+   CAST(saon AS STRING) AS saon,
+   CAST(street AS STRING) AS street,
+   CAST(locality AS STRING) AS locality,
+   CAST(town_city AS STRING) AS town_city,
+   CAST(district AS STRING) AS district,
+   CAST(county AS STRING) AS county,
+   CAST(transaction_type AS STRING) AS transaction_type,
+   CAST(record_status AS STRING) AS record_status,
+   CAST(location_hash AS STRING) AS location_hash
+FROM raw_price_paid
