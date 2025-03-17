@@ -1,0 +1,153 @@
+version: 2
+
+models:
+  - name: fact_property_sales
+    description: "Property transactions"
+    columns:
+      - name: price
+        description: "The price paid for the property"
+        tests:
+          - not_null
+        data_type: integer
+      - name: date_of_transfer
+        description: "The date when the transaction occurred"
+        tests:
+          - not_null
+        data_type: date
+      - name: is_new_build
+        description: "Whether it is a newly built property or not"
+        tests:
+          - not_null
+        data_type: bool
+      - name: transaction_uid
+        description: "The unique id of the transaction"
+        constraints:
+          - type: primary_key
+        tests:
+          - unique
+        data_type: string
+      - name: location_id
+        description: "Foreign Key to the location table"
+        data_type: string
+        constraints:
+          - type: foreign_key
+            to: ref('dim_locations')
+            to_columns: [location_id]
+      - name: property_type_id
+        description: "Foreign Key to the property type table"
+        data_type: string
+        constraints:
+          - type: foreign_key
+            to: ref('dim_property_types')
+            to_columns: [property_type_id]
+      - name: tenure_id
+        description: "Foreign Key to the tenure table"
+        data_type: string
+        constraints:
+          - type: foreign_key
+            to: ref('dim_tenures')
+            to_columns: [tenure_id]
+      - name: transaction_type_id
+        description: "Foreign Key to the transaction_type table"
+        data_type: string
+        constraints:
+          - type: foreign_key
+            to: ref('dim_transaction_types')
+            to_columns: [transaction_type_id]
+  - name: dim_locations
+    description: "Details of property location"
+    columns:
+      - name: location_id
+        description: "Generated surrogate key "
+        constraints:
+          - type: primary_key
+        date_type: string
+      - name: location_hash
+        description: "Hash of the location based on other columns (similar to surrogate key)"
+        data_type: string
+        tests:
+          - unique
+      - name: paon
+        description: "Primary Addressable Object Name. Typically the house number or name."
+        data_type: string
+      - name: saon
+        description: "Secondary Addressable Object Name. Where a property has been divided into separate units (for example, flats), the PAON (above) will identify the building and a SAON will be specified that identifies the separate unit/flat"
+        data_type: string
+      - name: street
+        data_type: string
+      - name: locality
+        data_type: string
+      - name: town_city
+        description: "The town or city of the property"
+        data_type: string
+      - name: district
+        data_type: string
+      - name: county
+        data_type: string
+      - name: postcode
+        data_type: string
+  - name: dim_property_types
+    description: "Details of whether the property is Detached, Semi-Detached, Terraced, Flats/Maisonettes or Other. There is no separate identification of bungalows. End-of-terrace properties are included in the Terraced category above. The Other category is only valid where the transaction relates to a property type that is not covered by existing values, for example where a property comprises more than one large parcel of land"
+    columns:
+      - name: property_type_id
+        description: "Generated surrogate key "
+        constraints:
+          - type: primary_key
+        date_type: string
+      - name: property_type
+        description: "This is the code i.e. D, S, T, F or O"
+        data_type: string
+        tests:
+          - accepted_values:
+              values: ["D", "S", "T", "F", "O"]
+      - name: property_type_name
+        description: "This is the full description of the property type code"
+        tests:
+          - accepted_values:
+              values:
+                [
+                  "Detached",
+                  "Semi-Detached",
+                  "Terraced",
+                  "Flats/Maisonettes",
+                  "Other",
+                ]
+  - name: dim_tenures
+    description: "Details of whether the property was a Leasehold or Freehold"
+    columns:
+      - name: tenure_id
+        description: "Generated surrogate key "
+        constraints:
+          - type: primary_key
+        date_type: string
+      - name: tenure
+        description: "This is the code i.e. F for Freehold, L for Leasehold"
+        data_type: string
+      - name: tenure_name
+        description: "This is the full description of the tenure code"
+        tests:
+          - accepted_values:
+              values: ["Freehold", "Leasehold", "unknown"]
+  - name: dim_transaction_types
+    description: "Indicates the type of Price Paid transaction. A = Standard Price Paid entry, includes single residential property sold for value. B = Additional Price Paid entry including transfers under a power of sale/repossessions, buy-to-lets (where they can be identified by a Mortgage), transfers to non-private individuals and sales where the property type is classed as ‘Other’. Note that category B does not separately identify the transaction types stated. HM Land Registry has been collecting information on Category A transactions from January 1995. Category B transactions were identified from October 2013."
+    columns:
+      - name: transaction_type_id
+        description: "Generated surrogate key "
+        constraints:
+          - type: primary_key
+        date_type: string
+      - name: transaction_type
+        description: "This is the code i.e. A for Standard, B for Additional"
+        data_type: string
+        tests:
+          - accepted_values:
+              values: ["A", "B"]
+      - name: transaction_type_name
+        description: "This is a fuller description of the transaction_type code"
+        data_type: string
+        tests:
+          - accepted_values:
+              values: ["Standard", "Additional"]
+      - name: transaction_type_description
+        description: "A more detailed description of the transaction_type code"
+        data_type: string
