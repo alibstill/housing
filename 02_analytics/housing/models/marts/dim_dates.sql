@@ -1,3 +1,10 @@
+{{ config(
+   materialized='table',
+   partition_by={'field': 'day_date', 'data_type': 'DATE', 'granularity': 'year'}
+)}}
+
+
+
 WITH raw_dates AS (
     SELECT day_date
     FROM UNNEST(GENERATE_DATE_ARRAY(DATE('1995-01-01'),DATE('2026-01-01'), INTERVAL 1 day)) AS day_date

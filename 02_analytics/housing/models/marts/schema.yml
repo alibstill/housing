@@ -14,6 +14,11 @@ models:
         tests:
           - not_null
         data_type: date
+      - name: year
+        description: "The year when the transaction occurred"
+        tests:
+          - not_null
+        data_type: integer
       - name: is_new_build
         description: "Whether it is a newly built property or not"
         tests:

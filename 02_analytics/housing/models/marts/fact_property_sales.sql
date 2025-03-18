@@ -1,7 +1,18 @@
+{{ config(
+    materialized="table",
+    partition_by={
+      "field": "date_of_transfer",
+      "data_type": "DATE",
+      "granularity": "year"
+    }
+) }}
+
+
 SELECT
    transaction_uid,
    price,
    date_of_transfer,
+   dim_dates.year,
    location_id,
    property_type_id,
    CASE 
@@ -16,5 +27,4 @@ INNER JOIN {{ ref('dim_locations')}} dim_location ON dim_location.location_hash 
 INNER JOIN {{ ref('dim_property_types')}} dim_property_type ON dim_property_type.property_type = stg_price_paid.property_type
 INNER JOIN {{ ref('dim_tenures')}} dim_tenure ON dim_tenure.tenure = stg_price_paid.tenure_duration
 INNER JOIN {{ ref('dim_transaction_types')}} dim_transaction_type ON dim_transaction_type.transaction_type = stg_price_paid.transaction_type
-
-
+INNER JOIN {{ ref('dim_dates')}} dim_dates on dim_dates.day_date = stg_price_paid.date_of_transfer
