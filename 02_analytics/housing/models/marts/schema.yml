@@ -1,6 +1,37 @@
 version: 2
 
 models:
+  - name: agg_price_county_ptype_tenure_is_new_yearly
+    description: "Aggregated pricing data by location, property type, tenure and whether is new build"
+    columns:
+      - name: year
+        description: "The year when the transaction occurred"
+        data_type: integer
+      - name: county
+        data_type: string
+      - name: tenure_name
+        description: "This is the full description of the tenure code"
+      - name: is_new_build
+        description: "Whether it is a newly built property or not"
+        data_type: bool
+      - name: property_type_name
+        description: "This is the full description of the property type code"
+        data_type: string
+      - name: num_transactions
+        description: "The total number of transactions"
+        data_type: integer
+      - name: avg_price
+        description: "The average price of a property"
+        data_type: float
+      - name: min_price
+        description: "The minimum property price"
+        data_type: integer
+      - name: max_price
+        description: "The maximum property price"
+        data_type: integer
+      - name: median_price
+        description: "The median property price"
+        data_type: integer
   - name: fact_property_sales
     description: "Property transactions"
     columns:

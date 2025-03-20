@@ -20,6 +20,7 @@ log/**
 
 # 02_analytics
 02_analytics/.venv_analytics/
+02_analytics/housing/.user.yml
 02_analytics/example/
 
 02_analytics/housing/profiles.yml
