@@ -62,3 +62,44 @@ resource "google_project_iam_member" "dbt_bq_admin" {
   member     = google_service_account.dbt_service_account.member
   depends_on = [null_resource.delay_dbt]
 }
+
+##########################
+# Metabase Service Account    #
+##########################
+resource "google_service_account" "metabase_service_account" {
+  account_id                   = "sa-dezc-housing-metabase-dev"
+  display_name                 = "DEV Metabase Service Account"
+  description                  = "Metabase Service Account for dev environment"
+  create_ignore_already_exists = true
+}
+
+resource "null_resource" "delay_metabase" {
+  provisioner "local-exec" {
+    command = "sleep 10"
+  }
+  triggers = {
+    "before" = "${google_service_account.metabase_service_account.id}"
+  }
+}
+
+resource "google_project_iam_member" "metabase_bq_data_viewer" {
+  project    = var.project_id
+  role       = "roles/bigquery.dataViewer"
+  member     = google_service_account.metabase_service_account.member
+  depends_on = [null_resource.delay_metabase]
+}
+
+resource "google_project_iam_member" "metabase_bq_metadata_viewer" {
+  project    = var.project_id
+  role       = "roles/bigquery.metadataViewer"
+  member     = google_service_account.metabase_service_account.member
+  depends_on = [null_resource.delay_metabase]
+}
+
+resource "google_project_iam_member" "metabase_bq_job_user" {
+  project    = var.project_id
+  role       = "roles/bigquery.jobUser"
+  member     = google_service_account.metabase_service_account.member
+  depends_on = [null_resource.delay_metabase]
+}
+

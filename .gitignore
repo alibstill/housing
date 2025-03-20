@@ -30,6 +30,8 @@ log/**
 02_analytics/housing/dbt_packages/
 02_analytics/housing/logs/
 
+02_analytics/visualisation/.credentials/
+
 # infrastructure
 infrastructure/.credentials/**
 infrastructure/scripts/.venv
