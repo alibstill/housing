@@ -1,10 +1,10 @@
 services:
   metabase:
-    image: metabase/metabase:latest
+    image: metabase/metabase:v0.53.7.4
     container_name: metabase
     hostname: metabase
     volumes:
-      - /dev/urandom:/dev/random:ro
+      - ./.metabase:/dev/random:ro
     ports:
       - 3000:3000
     environment:
@@ -14,6 +14,7 @@ services:
       MB_DB_USER: metabase
       MB_DB_PASS: mysecretpassword
       MB_DB_HOST: postgres
+      MB_ANON_TRACKING_ENABLED: "false"
     networks:
       - metanet1
     healthcheck:
@@ -22,15 +23,34 @@ services:
       timeout: 5s
       retries: 5
   postgres:
-    image: postgres:latest
-    container_name: postgres
+    image: postgres:17.4
+    container_name: metabase_backend_postgres
     hostname: postgres
+    ports:
+      - 5435:5432
     environment:
       POSTGRES_USER: metabase
       POSTGRES_DB: metabaseappdb
       POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      - ./.pg:/var/lib/postgresql/data
     networks:
       - metanet1
+  pgadmin:
+    image: dpage/pgadmin4:9
+    container_name: metabase_backend_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: examplepassword
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - 15432:80
+    volumes:
+      - ./.pgadmin:/var/lib/pgadmin
+    networks:
+      - metanet1
+    depends_on:
+      - postgres
 networks:
   metanet1:
     driver: bridge
