@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: agg_price_county_ptype_tenure_is_new_yearly
+  - name: agg_property_price_yearly
     description: "Aggregated pricing data by location, property type, tenure and whether is new build"
     columns:
       - name: year
