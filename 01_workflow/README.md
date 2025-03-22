@@ -18,6 +18,16 @@ This workflow downloads a csv file of a years worth of Price Paid data and uploa
 
 **Note that before you can run this pipeline, you must have setup your Google Cloud Platform (GCP) project and uploaded the google cloud credentials for the kestra service account created by terraform to the local kestra instance. See [Infrastructure](../infrastructure/notes/) and below.**
 
+3. Sync Files to Namespace (*WIP, not part of v1*)
+
+- kestra workflow: `sync_files_to_namespace`
+
+This workflow will sync all the files in the `01_workflow` and the `02_analytics` folder from my github repo to the `housing_local` namespace, which is not quite what I want to do longterm (I don't want to load all the files).
+
+To work, I needed to create a `GITHUB_ACCESS_TOKEN`. On my github profile, I clicked on my Profile photo then `Settings`. Went to `Developer Settings`, clicked on `Fine-grained tokens` from `Personal access tokens` and generated a new token. The token should have READ-ONLY access for Contents and Metadata.
+
+For version 1, I will manually upload files to the `housing_local` namespace and work on syncing files when I have Kestra running continuously in the cloud.
+
 ## Running Local services
 
 To run Kestra locally together with its postgres backend and the postgres housing database, run
