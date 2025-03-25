@@ -31,7 +31,7 @@ tasks:
       key: manifest.json
       namespace: "{{ flow.namespace }}"
     profiles: |
-      default:
+      housing:
         outputs:
           dev:
             type: bigquery

@@ -43,7 +43,7 @@ After this, you can run dbt locally:
 source .venv_analytics/bin/activate
 
 # Make sure you are in the directory
-cd housing
+cd dbt_project/housing
 
 # Make sure that your configuration works and you can connect to BigQuery
 dbt debug
