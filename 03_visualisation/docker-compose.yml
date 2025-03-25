@@ -27,7 +27,7 @@ services:
     container_name: metabase_backend_postgres
     hostname: postgres
     ports:
-      - 5435:5432
+      - 5436:5432
     environment:
       POSTGRES_USER: metabase
       POSTGRES_DB: metabaseappdb

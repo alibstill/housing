@@ -18,19 +18,20 @@ log/**
 01_workflow/.tmp/**
 01_workflow/scripts/src/temp/**
 
-# 02_analytics
-02_analytics/.venv_analytics/
-02_analytics/housing/.user.yml
-02_analytics/example/
+# 02_dbt
+02_dbt/.venv_analytics/
+02_dbt/housing/.user.yml
+02_dbt/example/
 
-02_analytics/housing/profiles.yml
-02_analytics/housing/.credentials/
+02_dbt/housing/profiles.yml
+02_dbt/housing/.credentials/
 
-02_analytics/housing/target/
-02_analytics/housing/dbt_packages/
-02_analytics/housing/logs/
+02_dbt/housing/target/
+02_dbt/housing/dbt_packages/
+02_dbt/housing/logs/
 
-02_analytics/visualisation/.credentials/
+# 03_visualisation
+03_visualisation/.credentials/
 
 # infrastructure
 infrastructure/.credentials/**
