@@ -7,9 +7,9 @@
     )
 }}
 
-
-WITH unique_locations AS (
-    SELECT DISTINCT location_hash,
+-- Get unique location information across rows
+WITH unique_location_rows AS (
+    SELECT DISTINCT location_hash,       
         paon,
         saon,
         street,
@@ -18,9 +18,10 @@ WITH unique_locations AS (
         district,
         county,
         postcode
-    FROM {{ ref('stg_price_paid') }}
+    FROM {{ ref('stg_price_paid') }} 
 ),
 
+-- Add location_id
 staging_locations AS (
     SELECT 
         {{ dbt_utils.generate_surrogate_key([
@@ -33,14 +34,37 @@ staging_locations AS (
             'county',
             'postcode'
         ])}} AS location_id,
-        *,
-        CURRENT_DATETIME() AS created_at
-    FROM unique_locations
+        location_hash,
+        paon,
+        saon,
+        street,
+        locality,
+        town_city,
+        district,
+        county,
+        postcode
+    FROM unique_location_rows
+),
+
+-- identify rows with the same location_hash
+-- example scenario: row 1 has {paon:23, saon: null...}, row 2 has {paon:null, saon: 23...}
+-- row 1 and row 2 will have the same location_hash but different location_ids
+ranked_locations AS (
+    SELECT *,
+        DENSE_RANK() OVER(PARTITION BY location_hash ORDER BY location_id) as rank
+    FROM staging_locations
+),
+
+deduped_locations AS (
+    SELECT *,
+        CURRENT_DATETIME() AS created_at   
+    FROM ranked_locations
+    WHERE rank = 1
 )
 
 SELECT *
-FROM staging_locations
+FROM deduped_locations
 {% if is_incremental() %}
--- only update dim_locations with location_ids that don't already exist in it
-    WHERE location_id NOT IN (SELECT location_id FROM {{ this }})
+    -- only update dim_locations when new location_hash that don't already exist in it
+    WHERE location_hash NOT IN (SELECT location_hash FROM {{ this }})
 {% endif %}
