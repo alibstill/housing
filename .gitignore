@@ -20,15 +20,15 @@ log/**
 
 # 02_dbt
 02_dbt/.venv_analytics/
-02_dbt/housing/.user.yml
+02_dbt/dbt_project/housing/.user.yml
 02_dbt/example/
 
-02_dbt/housing/profiles.yml
-02_dbt/housing/.credentials/
+02_dbt/dbt_project/housing/profiles.yml
+02_dbt/dbt_project/housing/.credentials/
 
-02_dbt/housing/target/
-02_dbt/housing/dbt_packages/
-02_dbt/housing/logs/
+02_dbt/dbt_project/housing/target/
+02_dbt/dbt_project/housing/dbt_packages/
+02_dbt/dbt_project/housing/logs/
 
 # 03_visualisation
 03_visualisation/.credentials/
