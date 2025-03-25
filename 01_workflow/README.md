@@ -4,21 +4,32 @@ This folder contains scripts and configuration required to run Kestra workflows.
 
 ## Workflow Descriptions
 
-1. Download price paid to local Postgres
+### Core workflows (GCP)
+
+**Note that before you can run any of the core pipelines, you must have setup your Google Cloud Platform (GCP) project and uploaded the google cloud credentials for the kestra service account created by terraform to the local kestra instance. See [Infrastructure](../infrastructure/notes/) and below.**
+
+1. Download Price Paid to GCS
+
+- kestra workflow: `flows/local_gcs_price_paid.yml`
+
+This workflow downloads a csv file of a years worth of Price Paid data and uploads it to a GCS bucket. It also performs some minor preprocessing (e.g. adding column names, adding location hash) and saves the result to another GCS bucket for use downstream.
+
+2. Load data and run transformations with dbt
+
+- kestra workflow: `flows/local_bg_dbt.yml`
+
+This workflow uses dbt to pull in processed data from the GCS bucket and transform it into models that can then be used for analytics.
+
+
+### Other workflows
+
+3.  Download price paid to local Postgres
 
 - kestra workflow: `flows/local_pg_price_paid.yml`
 
 This workflow downloads a csv file of a years worth of Price Paid data and uploads it to a local postgres database.
 
-2. Download Price Paid to GCS
-
-- kestra workflow: `flows/housing_gcs_price_paid.yml`
-
-This workflow downloads a csv file of a years worth of Price Paid data and uploads it to a local postgres database.
-
-**Note that before you can run this pipeline, you must have setup your Google Cloud Platform (GCP) project and uploaded the google cloud credentials for the kestra service account created by terraform to the local kestra instance. See [Infrastructure](../infrastructure/notes/) and below.**
-
-3. Sync Files to Namespace (*WIP, not part of v1*)
+4. Sync Files to Namespace (*WIP, not part of v1*)
 
 - kestra workflow: `sync_files_to_namespace`
 
@@ -28,9 +39,11 @@ To work, I needed to create a `GITHUB_ACCESS_TOKEN`. On my github profile, I cli
 
 For version 1, I will manually upload files to the `housing_local` namespace and work on syncing files when I have Kestra running continuously in the cloud.
 
-## Running Local services
+## Running Kestra
 
-To run Kestra locally together with its postgres backend and the postgres housing database, run
+To avoid costs, I have opted to run Kestra locally for v1.
+
+To run Kestra locally together with its postgres backend and the postgres housing database (see workflow 3 above), run
 
 ```bash
 docker-compose up -d
@@ -44,7 +57,12 @@ PgAdmin is available at: http://localhost:8085/
 
 1. Adding files to Namespace
 
-The flows make use of some Python [scripts](./scripts/). We need to manually add these files to Kestra.
+Both core flows rely on additional code: we need to manually upload code files to the `housing_local` namespace to enable the pipelines to make use of them.
+
+- `local_gcs_price_paid` needs [scripts](./scripts/)
+- `local_bq_dbt` needs [housing]()
+
+The flows make use of some Python . We need to manually add these files to Kestra.
 
 Navigate to the locally running kestra `Namespaces` (http://localhost:8080/ui/namespaces). Select `housing_local`. Go to `Files` and click on the plus icon to import the `scripts` folder and all its files.
 
@@ -67,6 +85,8 @@ After running the above in your terminal, you should now see a `.env_encoded` fi
 - Your `.env_encoded` is missing the last environment variable
 
 The bash loop script expects each line to end with a newline. Make sure that your `.env` file has this by hitting return after your last line.
+
+3. Uploading 
 
 ## Download price paid to local Postgres
 

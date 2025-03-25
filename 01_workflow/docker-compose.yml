@@ -35,7 +35,7 @@ services:
       - .tmp/:/tmp/kestra-wd/tmp
       - ./scripts/requirements.txt:/files/requirements.txt
       - ./scripts/src:/files/scripts
-      - ./flows:/local_flows
+      - ./kestra/flows:/local_flows
     env_file:
       - .env_encoded
     environment:

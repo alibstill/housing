@@ -13,10 +13,10 @@ log/**
 01_workflow/.env_encoded
 01_workflow/.credentials/**
 
-01_workflow/scripts/.venv/**
+01_workflow/scripts/scripts/.venv/**
 01_workflow/kestra-data/** 
 01_workflow/.tmp/**
-01_workflow/scripts/src/temp/**
+01_workflow/scripts/scripts/src/temp/**
 
 # 02_dbt
 02_dbt/.venv_analytics/

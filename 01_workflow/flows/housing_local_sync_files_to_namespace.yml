@@ -7,8 +7,8 @@ inputs:
     displayName: "directory"
     defaults: "01_workflow"
     values:
-      - "01_workflow"
-      - "02_analytics"
+      - "01_workflow/scripts"
+      - "02_dbt"
 
 tasks:
   - id: if_workflow_scripts
@@ -26,7 +26,7 @@ tasks:
         dryRun: false
   - id: if_analytics
     type: io.kestra.plugin.core.flow.If
-    condition: "{{inputs.git_directory == '02_analytics'}}"
+    condition: "{{inputs.git_directory == '02_dbt'}}"
     then:
       - id: upload_dbt_project
         type: io.kestra.plugin.git.SyncNamespaceFiles

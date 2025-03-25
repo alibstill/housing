@@ -1,5 +1,23 @@
 # Scripts
 
+## Setting up the virtual environment
+
+There is a `requirements.txt` file you can use to create a local virtual environment:
+
+```bash
+# pip install virtualenv # if you don't have virtualenv already
+
+# create new environment
+virtualenv .venv 
+
+# load venv
+source .venv/bin/activate
+
+# install dependencies
+pip install -r requirements.txt
+```
+
+
 ## Price Paid script
 There is a script in the root of this folder called `get_price_paid.py`. 
 
@@ -8,6 +26,7 @@ If run locally, it will download files from a url and save them to a `temp` fold
 For an overview of the inputs, use the help function:
 
 ```bash
+cd scripts
 source .venv/bin/activate
 python ./get_price_paid.py --help
 ```
@@ -15,6 +34,7 @@ python ./get_price_paid.py --help
 You can run this from this folder:
 
 ```bash
+cd scripts
 source .venv/bin/activate
 
 python ./get_price_paid.py --file_name={file_name} --base_url={base_url}
@@ -33,6 +53,7 @@ If run locally this script will process a specific csv file in the `src/temp` fo
 For an overview of the inputs, use the help function:
 
 ```bash
+cd scripts
 source .venv/bin/activate
 python process_csv.py --help
 ```
