@@ -5,15 +5,15 @@ inputs:
   - id: git_directory
     type: SELECT
     displayName: "directory"
-    defaults: "01_workflow"
+    defaults: "01_workflow/scripts"
     values:
       - "01_workflow/scripts"
-      - "02_dbt"
+      - "02_dbt/dbt_project"
 
 tasks:
   - id: if_workflow_scripts
     type: io.kestra.plugin.core.flow.If
-    condition: "{{inputs.git_directory == '01_workflow'}}"
+    condition: "{{inputs.git_directory == '01_workflow/scripts'}}"
     then:
       - id: upload_scripts
         type: io.kestra.plugin.git.SyncNamespaceFiles
@@ -26,7 +26,7 @@ tasks:
         dryRun: false
   - id: if_analytics
     type: io.kestra.plugin.core.flow.If
-    condition: "{{inputs.git_directory == '02_dbt'}}"
+    condition: "{{inputs.git_directory == '02_dbt/dbt_project'}}"
     then:
       - id: upload_dbt_project
         type: io.kestra.plugin.git.SyncNamespaceFiles
