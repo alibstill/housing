@@ -29,6 +29,12 @@ resource "google_project_iam_member" "kestra_gcs_admin" {
   depends_on = [null_resource.delay_kestra]
 }
 
+resource "google_project_iam_member" "kestra_bq_admin" {
+  project    = var.project_id
+  role       = "roles/bigquery.admin"
+  member     = google_service_account.kestra_service_account.member
+  depends_on = [null_resource.delay_kestra]
+}
 
 ##########################
 # DBT Service Account    #

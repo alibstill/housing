@@ -1,0 +1,38 @@
+id: bigquery_load_transform_price_paid
+namespace: housing_local
+
+tasks:
+  - id: dbt-build
+    type: io.kestra.plugin.dbt.cli.DbtCLI
+    env:
+      DBT_DATABASE: "{{secret('GCP_PROJECT_ID')}}"
+      DBT_SCHEMA: "{{secret('GCP_DATASET_NAME')}}"
+    namespaceFiles:
+      enabled: true
+    containerImage: ghcr.io/kestra-io/dbt-bigquery:latest
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    inputFiles:
+      sa.json: "{{kv('GCP_CREDENTIALS')}}"
+    commands:
+      - cd housing
+      - dbt deps
+      - dbt debug --profiles-dir ../
+      - dbt run-operation stage_external_sources --profiles-dir ../
+      - dbt build --profiles-dir ../
+    storeManifest:
+      key: manifest.json
+      namespace: "{{ flow.namespace }}"
+    profiles: |
+      housing:
+        outputs:
+          dev:
+            type: bigquery
+            dataset: "{{secret('GCP_DATASET_NAME')}}"
+            project: "{{secret('GCP_PROJECT_ID')}}"
+            location: "{{secret('GCP_LOCATION')}}"
+            keyfile: ../sa.json
+            method: service-account
+            threads: 4
+        target: dev
+

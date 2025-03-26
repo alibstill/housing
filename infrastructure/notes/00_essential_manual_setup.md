@@ -204,7 +204,7 @@ After you have completed the steps above to create the infrastructure on GCP, yo
 gcloud auth login
 
 # update path and project id
-gcloud iam service-accounts keys create ../02_analytics/housing/.credentials/dbt-dev.json \
+gcloud iam service-accounts keys create ../02_dbt/dbt_project/housing/.credentials/dbt-dev.json \
   --iam-account=sa-dezc-housing-dbt-dev@dezc-housing.iam.gserviceaccount.com
 ```
 
@@ -218,7 +218,7 @@ After you have completed the steps above to create the infrastructure on GCP, yo
 gcloud auth login
 
 # update path and project id
-gcloud iam service-accounts keys create ../02_analytics/visualisation/.credentials/metabase-dev.json \
+gcloud iam service-accounts keys create ../03_visualisation/.credentials/metabase-dev.json \
   --iam-account=sa-dezc-housing-metabase-dev@dezc-housing.iam.gserviceaccount.com
 ```
 
