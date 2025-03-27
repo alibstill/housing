@@ -4,48 +4,118 @@ This folder contains scripts and configuration required to run Kestra workflows.
 
 ## Workflow Descriptions
 
-### Core workflows (GCP)
+### Core workflow (GCP)
 
 **Note that before you can run any of the core pipelines, you must have setup your Google Cloud Platform (GCP) project and uploaded the google cloud credentials for the kestra service account created by terraform to the local kestra instance. See [Infrastructure](../infrastructure/notes/) and below (Manual Configuration (3)).**
 
-1. Download Price Paid to GCS
+1. ETLT: extract, transform, load and transform price paid
 
-- kestra workflow: `flows/local_gcs_price_paid.yml`
+- name: `gc_etlt_price_paid`
+- kestra workflow: `flows/housing_local_gc_etlt_price_paid.yml`
 
-This workflow downloads a csv file of a years worth of Price Paid data and uploads it to a GCS bucket. It also performs some minor preprocessing (e.g. adding column names, adding location hash) and saves the result to another GCS bucket for use downstream.
+**What does it do?**
 
-2. Load data and run transformations with dbt
+This workflow retrieves price paid data for every year from 1995 to 2025, loads the raw data into google cloud storage bucket ("raw") then transforms this raw data and stores the end result in another google cloud storage bucket ("processed") as parquet files. After this the pipeline runs dbt commands to load the parquet files into BigQuery as an external table and transform the data to create new dimension, fact and aggregate tables for use in downstream analytics.
 
-- kestra workflow: `flows/local_bg_dbt.yml`
+**Subflows called**
 
-This workflow uses dbt to pull in processed data from the GCS bucket and transform it into models that can then be used for analytics.
+This workflow calls the following subflows:
+- `gc_extract_raw_price_paid`
+- `gc_transform_raw_price_paid`
+- `gc_load_transform_price_paid`
 
+**When to use**
+
+This is the core workflow i.e. the one that should be run every month to get the most up-to-date price paid data.
+
+This workflow took around 1 hour to complete on my machine.
+
+### Subflows
+
+2. Extract 
+
+- name: - `gc_extract_raw_price_paid`
+- kestra workflow: `flows/housing_local_gc_extract_raw_price_paid.yml`
+
+**What does it do?**
+
+This workflow takes a year in the range 1995 to 2025 as input and downloads a csv file of Price Paid data for that year. It then uploads this raw csv file to the `landregistry_price_paid` folder in a GCS bucket called `{google-cloud-project-id}-raw`. The `{project-id}-raw/landregistry_price_paid` bucket is where the original, untransformed yearly price paid csvs are stored. 
+
+Since the data is updated monthly, each raw file has the following naming conventions: 
+
+- `pp-{yyyy}_{yyyy-MM}.csv` e.g. `pp-2004_2025-03.csv` 
+
+This indicates that this file is the price paid data for 2004 downloaded in March 2025. 
+
+The size of the price paid files range from 115 MB to 230 MB.
+
+**When to use**
+
+You can use this to download a file with a specific year to GCS.
+
+3. Transform (Basic)
+
+- name:`gc_transform_raw_price_paid`
+- kestra workflow: `flows/housing_local_gc_transform_raw_price_paid.yml`
+
+**What does it do?**
+
+This workflow takes a year in the range 1995 to 2025 as input and loads the relevant raw price paid data from the month in which the pipeline is running e.g. I was running the pipeline with year=2004 in March 2025 so it picked up the `pp-2004_2025-03.csv` file. It then performs some minor transformations and stores the result in a GCS bucket called `{google-cloud-project-id}-processed`.
+
+**When to use**
+
+You can use this to transform a file for a specific year.
+
+4. Load and Transform with dbt
+
+- name: `gc_load_transform_price_paid`
+- kestra workflow: `flows/housing_local_gc_load_transform_price_paid.yml`
+
+**What does it do?**
+
+This workflow runs the dbt project which loads the price paid parquet files from the "processed" bucket as an external table in BigQuery and then performs a series of transformations to create some dimension, fact and aggregate tables for downstream analytics
+
+**When to use**
+
+Use this when you want to create tables in Bigquery.
 
 ### Other workflows
 
-3.  Download price paid to local Postgres
+5.  Extract and Transform Price Paid data to google cloud storage (*deprecated*)
 
-- kestra workflow: `flows/local_pg_price_paid.yml`
+- name: `gc_extract_transform_raw_price_paid`
+- kestra workflow: `flows/housing_local_gc_extract_transform_raw_price_paid.yml`
 
-This workflow downloads a csv file of a years worth of Price Paid data and uploads it to a local postgres database.
+**What does it do?**
 
-4. Sync Files to Namespace (*not part of v1*)
+This workflow combines `gc_extract_raw_price_paid` and `gc_transform_raw_price_paid`. 
 
-- kestra workflow: `sync_files_to_namespace`
+**When to use**
+
+This is an old flow but I kept it here because it may be useful when you want to download and transform data for a specific year.
+
+6. Sync Files to Namespace (*not part of v1*)
+
+- name: `sync_files_to_namespace`
+- kestra workflow: `flows/housing_local_sync_files_to_namespace`
+
+**What does it do?**
 
 This workflow will sync all the files in the `01_workflow/scripts` and the `02_dbt/dbt_project` folder from my github repo to the `housing_local` namespace.
 
-To get this to work, I needed to create a `GITHUB_ACCESS_TOKEN`. On my github profile, I clicked on my Profile photo then `Settings`. Went to `Developer Settings`, clicked on `Fine-grained tokens` from `Personal access tokens` and generated a new token. The token should have READ-ONLY access for Contents and Metadata.
-
 For version 1, I will manually upload files to the `housing_local` namespace and work on syncing files when I have Kestra running continuously in the cloud.
 
+**When to use**
+
 Note that if you want to get this flow to work, you will need to upload the project to your own github repo and generate a github access token with read-only access for Contents and Metadata.
+
+To get this to work, I needed to create a `GITHUB_ACCESS_TOKEN`. On my github profile, I clicked on my Profile photo then `Settings`. Went to `Developer Settings`, clicked on `Fine-grained tokens` from `Personal access tokens` and generated a new token. The token should have READ-ONLY access for Contents and Metadata. I then added it to my `.env` (see .env_example). 
 
 ## Running Kestra
 
 To avoid costs, I have opted to run Kestra locally for v1.
 
-To run Kestra locally together with its postgres backend and the postgres housing database (see workflow 3 above), run
+To run Kestra locally together with its postgres backend run
 
 ```bash
 docker-compose up -d
@@ -53,7 +123,8 @@ docker-compose up -d
 
 Kestra is available at: http://localhost:8080/
 
-PgAdmin is available at: http://localhost:8085/
+Navigate to Flows and you should see all 6 workflows described above.
+
 
 ### Manual Configuration
 
@@ -128,24 +199,3 @@ The JSON will look something like this:
   "universe_domain": "googleapis.com"
 }
 ```
-
-## Download price paid to local Postgres (additional configuration)
-
-In addition to adding files to the Namespace and setting up the environment variables, you will also need to configure pgadmin if you want to view the price paid data in PostgreSQL locally.
-
-### Configuring PgAdmin
-This docker-compose.yml contains a PgAdmin instance to make it easier to view your housing database.
-
-After running `docker-compose up -d`, navigate to http://localhost:8085/.
-
-Right click on `Servers` and select `Register. 
-
-In the `General` tab, give the database a name e.g. `housing`. This is just the name that will be used for the database in PgAdmin, it does not need to be the same as the name used in your docker-compose file.
-
-In connection enter the following:
-- Host name/address: host.docker.internal
-- Port: 5435 
-- Username: my_user
-- Password: my_password
-
-Note that port, username and password must match the configurations specified in your docker-compose file.
