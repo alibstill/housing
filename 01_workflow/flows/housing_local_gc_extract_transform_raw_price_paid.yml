@@ -1,4 +1,4 @@
-id: gcs_load_transform_price_paid
+id: gc_extract_transform_raw_price_paid.
 namespace: housing_local
 
 inputs:
@@ -86,7 +86,7 @@ tasks:
     type: io.kestra.plugin.gcp.gcs.Upload
     from: "{{render(vars.parquet_data)}}"
     to: "{{render(vars.gcs_processed_file_path)}}"
-  
+
   - id: purge_large_files
     type: io.kestra.plugin.core.storage.PurgeCurrentExecutionFiles
 

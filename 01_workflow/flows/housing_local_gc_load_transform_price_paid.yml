@@ -1,4 +1,4 @@
-id: bigquery_load_transform_price_paid
+id: gc_load_transform_price_paid.
 namespace: housing_local
 
 tasks:
@@ -35,4 +35,3 @@ tasks:
             method: service-account
             threads: 4
         target: dev
-
