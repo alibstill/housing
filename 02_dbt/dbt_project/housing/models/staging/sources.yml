@@ -9,7 +9,6 @@ sources:
     tables:
       - name: price_paid
         external:
-          # location: "gs://dezc-housing-processed/land_registry_price_paid/year=*/pp-*.parquet" # cannot use multiple wildcards
           location: "gs://dezc-housing-processed/*"
           options:
             format: parquet
@@ -17,7 +16,3 @@ sources:
           partitions:
             - name: year
               data_type: int
-        # tests:
-        #   - dbt_utils.type_of_column:
-        #       column_name: event_id # check if event_id is integer
-        #       data_type: integer
