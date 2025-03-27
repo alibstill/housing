@@ -1,0 +1,42 @@
+id: gc_etlt_price_paid
+namespace: housing_local
+
+tasks:
+  - id: extract_price_paid_data_gcs
+    type: io.kestra.plugin.core.flow.ForEach
+    values: "[1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017,2018,2019, 2020, 2021, 2022, 2023, 2024, 2025]"
+    concurrencyLimit: 4 # run up to 15 tasks in parallel
+    tasks:
+      - id: parallel_extract
+        type: io.kestra.plugin.core.flow.Parallel
+        tasks:
+          - id: extract_price_paid_data_by_year
+            type: io.kestra.plugin.core.flow.Subflow
+            inputs:
+              year: "{{ parent.taskrun.value }}" # items of the batch
+            namespace: housing_local
+            flowId: gc_extract_raw_price_paid
+            # revision: 1 # optional (default: latest)
+            wait: true # wait for the subflow execution
+            transmitFailed: true # fail the task run if the subflow execution fails
+  - id: transform_price_paid_data_gcs
+    type: io.kestra.plugin.core.flow.ForEach
+    values: "[1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017,2018,2019, 2020, 2021, 2022, 2023, 2024, 2025]"
+    concurrencyLimit: 4 # run up to 15 tasks in parallel
+    tasks:
+      - id: parallel_transform
+        type: io.kestra.plugin.core.flow.Parallel
+        tasks:
+          - id: transform_price_paid_data_by_year
+            type: io.kestra.plugin.core.flow.Subflow
+            inputs:
+              year: "{{ parent.taskrun.value }}" # items of the batch
+            namespace: housing_local
+            flowId: gc_transform_raw_price_paid
+            # revision: 1 # optional (default: latest)
+            wait: true # wait for the subflow execution
+            transmitFailed: true # fail the task run if the subflow execution fails
+  - id: load_transform_bigquery
+    type: io.kestra.plugin.core.flow.Subflow
+    namespace: housing_local
+    flowId: gc_load_transform_price_paid
