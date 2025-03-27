@@ -3,8 +3,6 @@ volumes:
     driver: local
   kestra-data:
     driver: local
-  housing-data:
-    driver: local
 
 services:
   postgres_kestra_be:
@@ -82,29 +80,4 @@ services:
       - "8081:8081"
     depends_on:
       postgres_kestra_be:
-        condition: service_started
-
-  postgres_housing:
-    image: postgres
-    environment:
-      POSTGRES_USER: my_user
-      POSTGRES_PASSWORD: my_password
-      POSTGRES_DB: housing
-    ports:
-      - "5435:5432"
-    volumes:
-      - housing-data:/var/lib/postgresql/data
-    depends_on:
-      kestra:
-        condition: service_started
-
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=root
-    ports:
-      - "8086:80"
-    depends_on:
-      postgres_housing:
         condition: service_started
