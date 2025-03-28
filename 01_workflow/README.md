@@ -13,6 +13,53 @@ This folder contains scripts and configuration required to run Kestra workflows.
 - name: `gc_etlt_price_paid`
 - kestra workflow: `flows/housing_local_gc_etlt_price_paid.yml`
 
+**Tasks**
+
+There are three main tasks, two call subflows and are built to run in parallel with a maximum of 4 threads. This means it extracts and transforms 4 years of data at a time. Note that the tasks run sequentially i.e. raw data for all years (1995 to 2025 inclusive) is extracted and loaded to GCS first before being transformed in the second task.
+
+```mermaid
+flowchart LR
+  ExtractRaw --> TransformRaw
+  TransformRaw --> Load[Load and Transform in BigQuery]
+  subgraph ExtractRaw[Extract Raw to GCS]
+    YearRaw[List of years] --> StartExtractPricePaid1
+    YearRaw --> StartExtractPricePaid2
+    YearRaw --> StartExtractPricePaid3
+    YearRaw --> StartExtractPricePaid4
+    subgraph "Thread 1"
+      StartExtractPricePaid1[Year] --> ExtractUpload1[Run gc_extract_raw_price_paid pipeline]
+    end
+    subgraph "Thread 2"
+      StartExtractPricePaid2[Year] --> ExtractUpload2[Run gc_extract_raw_price_paid pipeline]
+    end
+    subgraph "Thread 3"
+      StartExtractPricePaid3[Year] --> ExtractUpload3[Run gc_extract_raw_price_paid pipeline]
+
+    end
+    subgraph "Thread 4"
+      StartExtractPricePaid4[Year] --> ExtractUpload4[Run gc_extract_raw_price_paid pipeline]
+    end    
+  end
+  subgraph TransformRaw[Transform Raw to GCS]
+    YearTransformed[List of years] --> StartTransformPricePaid1
+    YearTransformed --> StartTransformPricePaid2
+    YearTransformed --> StartTransformPricePaid3
+    YearTransformed --> StartTransformPricePaid4
+    subgraph "Thread 1"
+      StartTransformPricePaid1[Year] --> TransformUpload1[Run gc_transform_raw_price_paid pipeline]
+    end
+    subgraph "Thread 2"
+      StartTransformPricePaid2[Year] --> TransformUpload2[Run gc_transform_raw_price_paid pipeline]
+    end
+    subgraph "Thread 3"
+      StartTransformPricePaid3[Year] --> TransformUpload3[Run gc_transform_raw_price_paid pipeline]
+    end
+    subgraph "Thread 4"
+      StartTransformPricePaid4[Year] --> TransformUpload4[Run gc_transform_raw_price_paid pipeline]
+    end    
+  end
+```
+
 **What does it do?**
 
 This workflow retrieves price paid data for every year from 1995 to 2025, loads the raw data into google cloud storage bucket ("raw") then transforms this raw data and stores the end result in another google cloud storage bucket ("processed") as parquet files. After this the pipeline runs dbt commands to load the parquet files into BigQuery as an external table and transform the data to create new dimension, fact and aggregate tables for use in downstream analytics.
