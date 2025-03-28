@@ -1,4 +1,4 @@
-id: gc_extract_transform_raw_price_paid.
+id: gc_extract_transform_raw_price_paid
 namespace: housing_local
 
 inputs:

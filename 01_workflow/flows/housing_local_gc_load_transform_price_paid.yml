@@ -17,7 +17,6 @@ tasks:
     commands:
       - cd housing
       - dbt deps
-      - dbt debug --profiles-dir ../
       - dbt run-operation stage_external_sources --profiles-dir ../
       - dbt build --profiles-dir ../
     storeManifest:

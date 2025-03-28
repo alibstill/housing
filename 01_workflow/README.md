@@ -30,12 +30,23 @@ This is the core workflow i.e. the one that should be run every month to get the
 
 This workflow took around 1 hour to complete on my machine.
 
+
 ### Subflows
 
-2. Extract 
+2. **Extract** 
 
 - name: - `gc_extract_raw_price_paid`
 - kestra workflow: `flows/housing_local_gc_extract_raw_price_paid.yml`
+
+**Tasks**
+
+```mermaid
+flowchart LR
+  Start["Select Year (1995 - 2025)"] --> SetLabel[Set Labels]
+  SetLabel --> Extract[Download Price Paid CSV]
+  Extract --> UploadRaw[Upload Price Paid CSV to 'raw' bucket <img src='images/cloud_storage.svg' width='40' height='40' /> ]
+  UploadRaw --> Purge[Purge large files]
+```
 
 **What does it do?**
 
@@ -53,10 +64,21 @@ The size of the price paid files range from 115 MB to 230 MB.
 
 You can use this to download a file with a specific year to GCS.
 
-3. Transform (Basic)
+3. **Transform (Basic)**
 
 - name:`gc_transform_raw_price_paid`
 - kestra workflow: `flows/housing_local_gc_transform_raw_price_paid.yml`
+
+**Tasks**
+
+```mermaid
+flowchart LR
+  Start["Select Year (1995 - 2025)"] --> SetLabel[Set Labels]
+  SetLabel --> Extract[Download Raw Price Paid CSV from GCS <img src='images/cloud_storage.svg' width='40' height='40'/> ]
+  Extract --> Transform[Transform]
+  Transform --> UploadProcessed[Upload transformed parquet file to 'processed' bucket <img src='images/cloud_storage.svg' width='40' height='40'/> ]
+  UploadProcessed --> Purge[Purge large files]
+```
 
 **What does it do?**
 
@@ -71,6 +93,16 @@ You can use this to transform a file for a specific year.
 - name: `gc_load_transform_price_paid`
 - kestra workflow: `flows/housing_local_gc_load_transform_price_paid.yml`
 
+**Task**
+
+There is only one task, `dbt build`, which runs the following commands:
+
+```mermaid
+flowchart LR
+  Start[dbt deps] --> ExternalTables["dbt run-operation stage_external_sources (create/refresh external tables)"]
+  ExternalTables --> DbtBuild[dbt build] 
+```
+
 **What does it do?**
 
 This workflow runs the dbt project which loads the price paid parquet files from the "processed" bucket as an external table in BigQuery and then performs a series of transformations to create some dimension, fact and aggregate tables for downstream analytics
@@ -81,10 +113,22 @@ Use this when you want to create tables in Bigquery.
 
 ### Other workflows
 
-5.  Extract and Transform Price Paid data to google cloud storage (*deprecated*)
+5.  **Extract and Transform Price Paid data to google cloud storage (*deprecated*)**
 
 - name: `gc_extract_transform_raw_price_paid`
 - kestra workflow: `flows/housing_local_gc_extract_transform_raw_price_paid.yml`
+
+**Tasks**
+
+```mermaid
+flowchart LR
+  Start["Select Year (1995 - 2025)"] --> SetLabel[Set Labels]
+  SetLabel --> Extract[Download Price Paid CSV]
+  Extract --> UploadRaw[Upload Price Paid CSV to 'raw' bucket <img src='images/cloud_storage.svg' width='40' height='40' /> ]
+  UploadRaw --> Transform[Transform]
+  Transform --> UploadProcessed[Upload transformed parquet file to 'processed' bucket <img src='images/cloud_storage.svg' width='40' height='40'/> ]
+  UploadProcessed --> Purge[Purge large files]
+```
 
 **What does it do?**
 
