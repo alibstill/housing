@@ -17,7 +17,6 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-
 ## Price Paid script
 There is a script in the root of this folder called `get_price_paid.py`. 
 
@@ -67,24 +66,45 @@ python process_csv.py --src_file_name={src_file_name}
 python process_csv.py --src_file_name=pp-2015 
 ```
 
-## CSV to pq script
+## Testing, Linting and Coverage
 
-This script converts a csv file to parquet. 
+1. Testing
 
-If run locally this script will convert a specific csv file in the `src/temp` folder to parquet.
-
-For an overview of the inputs, use the help function:
+The scripts are unit tested with `pytest`:
 
 ```bash
-sourc .venv/bin/activate
-python csv_to_pq.py --help
+cd scripts
+source .venv/bin/activate
+pytest . -v
 ```
 
-You can run this from this folder:
+2. Coverage
+
+Run the tests with coverage:
 
 ```bash
-python csv_to_pq.py --src_file_name={src_file_name} 
-
-# Example
-python csv_to_pq.py --src_file_name=pp-2015 
+coverage run -m pytest .
+coverage report
 ```
+
+3. Ruff 
+
+To run the linter:
+
+```bash
+cd scripts
+source .venv/bin/activate
+ruff check . 
+ruff check --fix 
+```
+
+To format files run: 
+
+```bash
+cd scripts
+source .venv/bin/activate
+ruff format . 
+```
+
+
+

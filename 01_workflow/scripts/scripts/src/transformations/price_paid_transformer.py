@@ -23,19 +23,11 @@ def add_location_hash(dframe: pd.DataFrame, logger: Logger):
         "district",
         "county",
     ]
-
-    logger.info("Using %s columns to create location hash", ",".join(hash_columns))
     # reorganize hash columns so that they appear like indexes. Note that if any of the
     # column values are NaN then they won't appear as a potential index. This approach
     # allows us to handle any unwanted NaN columns
     df_stacked = dframe[hash_columns].stack()
-    if df_stacked.index.get_level_values(0).nunique() != len(dframe):
-        # This should never happen that there is absolutely no address data
-        logger.error(
-            "Possible rows with no address data. Length original: %d, length stacked: %s",
-            len(dframe),
-            df_stacked.index.get_level_values(0).nunique(),
-        )
+
     # Create a string from all the info in the location columns
     series_str_concat = df_stacked.groupby(level=0).agg(";".join)
     # Create a hash of the string
