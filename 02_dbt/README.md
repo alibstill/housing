@@ -1,5 +1,8 @@
 # DBT Project
 
+## Modelling
+
+For a full description of the modelling and bigquery design decisions including partitioning choices, please see [models.md](./models.md)
 
 ## Setting up the project
 
@@ -63,11 +66,15 @@ dbt run --select +stg_price_paid
 
 **Generate Docs**
 
+To get an overview of the models, a description of the columns and view the lineage graphs, you can generate documentation and have it served locally:
+
 ```bash
 dbt docs generate
 
 dbt docs serve --port=8090 # if you have kestra running you need to specify a different port
 ```
+
+I have also used a tool called [dbterd](https://github.com/datnguye/dbterd) to help generate initial mermaid entity relationship diagrams from dbt artifact files, which I have revised for use in [models.md](./models.md).
 
 **Run tests**
 
