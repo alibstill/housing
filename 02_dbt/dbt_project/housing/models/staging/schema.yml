@@ -1,0 +1,63 @@
+version: 2
+
+models:
+  - name: stg_price_paid
+    description: "Staging table for Price Paid transaction data. Casts data to appropriate types."
+    columns:
+      - name: transaction_uid
+        description: "The unique id of the transaction"
+        data_type: string
+      - name: price
+        description: "The price paid for the property"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              inclusive: false # should not be zero
+        data_type: integer
+      - name: date_of_transfer
+        description: "The date when the transaction occurred"
+        tests:
+          - not_null
+        data_type: date
+      - name: postcode
+        data_type: string
+      - name: property_type
+        description: "Description of the property type"
+        data_type: string
+      - name: is_new_build
+        description: "Whether it is a newly built property or not"
+        data_type: string
+      - name: tenure_duration
+        description: "This is the code i.e. F for Freehold, L for Leasehold"
+        data_type: string
+      - name: paon
+        description: "Primary Addressable Object Name. Typically the house number or name."
+        data_type: string
+      - name: saon
+        description: "Secondary Addressable Object Name. Where a property has been divided into separate units (for example, flats), the PAON (above) will identify the building and a SAON will be specified that identifies the separate unit/flat"
+        data_type: string
+      - name: street
+        description: "The street name of the property"
+        data_type: string
+      - name: locality
+        data_type: string
+      - name: town_city
+        description: "The town or city of the property"
+        data_type: string
+      - name: district
+        data_type: string
+      - name: county
+        data_type: string
+      - name: transaction_type
+        description: "This is the code i.e. A for Standard, B for Additional"
+        data_type: string
+      - name: record_status
+        description: "Indicates additions, changes and deletions to the records.A = Addition, C = Change, D = Delete. This is only relevant to the monthly file. It should be A for yearly files."
+        data_type: string
+        tests:
+          - accepted_values:
+              values: ["A"]
+      - name: location_hash
+        description: "Hash of the location based on other columns (similar to surrogate key)"
+        data_type: string

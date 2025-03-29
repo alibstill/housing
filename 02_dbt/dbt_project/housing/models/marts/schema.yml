@@ -44,6 +44,9 @@ models:
         description: "The date when the transaction occurred"
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_dates')
+              field: day_date
         data_type: date
       - name: year
         description: "The year when the transaction occurred"
@@ -69,6 +72,10 @@ models:
           - type: foreign_key
             to: ref('dim_locations')
             to_columns: [location_id]
+        tests:
+          - relationships:
+              to: ref('dim_locations')
+              field: location_id
       - name: property_type_id
         description: "Foreign Key to the property type table"
         data_type: string
@@ -76,6 +83,10 @@ models:
           - type: foreign_key
             to: ref('dim_property_types')
             to_columns: [property_type_id]
+        tests:
+          - relationships:
+              to: ref('dim_property_types')
+              field: property_type_id
       - name: tenure_id
         description: "Foreign Key to the tenure table"
         data_type: string
@@ -83,6 +94,10 @@ models:
           - type: foreign_key
             to: ref('dim_tenures')
             to_columns: [tenure_id]
+        tests:
+          - relationships:
+              to: ref('dim_tenures')
+              field: tenure_id
       - name: transaction_type_id
         description: "Foreign Key to the transaction_type table"
         data_type: string
@@ -90,6 +105,10 @@ models:
           - type: foreign_key
             to: ref('dim_transaction_types')
             to_columns: [transaction_type_id]
+        tests:
+          - relationships:
+              to: ref('dim_transaction_types')
+              field: transaction_type_id
   - name: dim_locations
     description: "Details of property location"
     columns:
@@ -110,6 +129,7 @@ models:
         description: "Secondary Addressable Object Name. Where a property has been divided into separate units (for example, flats), the PAON (above) will identify the building and a SAON will be specified that identifies the separate unit/flat"
         data_type: string
       - name: street
+        description: "The street name of the property"
         data_type: string
       - name: locality
         data_type: string
