@@ -4,7 +4,7 @@ This is an overview of the Questions/SQL queries I created with Metabase's nativ
 
 I created two tabs on my dashboard: one that showed metrics for properties in England and Wales over the last 30 years and another that showed the same information filtered by location (County). Both dashboards contain the same tiles: the only difference between them is the filtering.
 
-**Before writing your SQL queries in the editor, M=make sure you have the correct database i.e. `Property Prices` (or whatever `Display Name` value you used during the BigQuery database connection setup).**
+**Before writing your SQL queries in the editor, make sure you have the correct database i.e. `Property Prices` (or whatever `Display Name` value you used during the BigQuery database connection setup).**
 
 ## Main dashboard (All)
 
@@ -91,7 +91,7 @@ AND property_type_name != 'Other'
 ORDER BY year;
 ```
 
-**Visualization**: Bar
+**Visualization**: Line
 
 **Visualization Cog**: Make sure the X-axis is `year` and the Y-axis is `median_price`. Then add another series (property_type_name) to show median price by property_type.
 
