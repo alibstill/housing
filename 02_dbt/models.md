@@ -49,7 +49,8 @@ In the future a more efficient pattern might be to examine the monthly file and 
 
 #### Staging View: stg_price_paid
 
-`stg_price_paid` is a view over the external_table where I cast the price paid data into appropriate data types for use by downstream fact and dimension tables
+`stg_price_paid` is a view over the external_table where I cast the price paid data into appropriate data types for use by downstream fact and dimension tables.
+
 
 ### Fact and Dimension Tables
 
@@ -163,3 +164,69 @@ The fact table has over 29 million rows i.e. 29 million property sales.
 `fact_property_sales` is partitioned by year to speed up queries: `agg_property_price_yearly` use the fact table to create summary statistics about property prices by year. By partitioning the fact table by year we make these queries faster and cheaper.
 
 
+### Aggregate Fact Table: agg_property_price_yearly
+
+I created the aggregate fact table to use with my BI frontend (metabase) to improve query performance and thus costs: rather than aggregating across the massive fact table, this table stores some precalculated aggregates I can use.
+
+I am interested in how house prices change across years by location (county), property type (Semi-detached/terraced etc.), tenure (Leasehold/Freehold) and whether or not the property is a new build. 
+
+So I want to know things like
+- how has the median price changed in Greater London over the last 30 years?
+- are new builds more expensive than old builds? Has this changed over the years? Does it depend on the location?
+- do most property transactions involve freeholds? Are freeholds more expensive? Has this changed over the years?
+
+To answer questions like this, I created the `agg_property_price_yearly` table which uses a SQL `CUBE` operation to find summary statistics (count, average, median, min and max) across all of these different axes.
+
+**Querying the data**
+
+The table below gives you an idea of what the data looks like: remember that for `CUBE` operations, the `null` values should be interpreted as 'all' so when we want to get aggregates across all years we filter by `year IS NULL`. If we want to get aggregates across all property types we filter by `property_type_name IS NULL`
+
+| year      | county              | property_type_name  | tenure_name | is_new_build  | num_transactions  | avg_price | min_price | max_price | median_price  |
+| --------- | ------------------- | ------------------  | ----------- | ------------  | ----------------  | --------- |  -------- | --------- |  -----------  |
+| 2000      | GREATER MANCHESTER  | Terraced            | null        | true          | 761               | 72748.77  | 14000     | 359950    | 61695         |
+| 2000      | GREATER MANCHESTER  | Terraced            | null        | false         | 18906             | 39932.79  | 305       | 950000    | 34950         |
+| 2000      | GREATER MANCHESTER  | Terraced            | null        | null          | 19667             | 41202.58  | 305       | 950000    | 35000         |
+
+In the first two rows we get a breakdown of Terraced Property prices in Greater Manchester in 2000 by `is_new_build`. If we wanted to get just aggregated price data for Terraced Property prices in Greater Manchester in 2000 **without** breaking this down further by `is_new_build`, we would set `is_new_build IS NULL` in our SQL query. 
+
+Some examples:
+
+1. Get the total number of transactions in the database and the median property price across all years
+
+```sql
+SELECT num_transactions, median_price
+FROM `{project-id}.housing.agg_property_price_yearly` 
+WHERE county IS NULL
+AND property_type_name IS NULL
+AND year IS NULL
+AND tenure_name IS NULL
+AND is_new_build IS NULL;
+
+-- example output
+--| num_transactions | median_price   |
+--| ---------------- | -------------- |
+--| 29,900,800       | 154950         |
+```
+
+2. Get the total number of transactions and the median property price in 2021 and 2022
+
+```sql
+SELECT year, num_transactions, median_price
+FROM `{project-id}.housing.agg_property_price_yearly` 
+WHERE county IS NULL
+AND property_type_name IS NULL
+AND year IN (2021,2022)
+AND tenure_name IS NULL
+AND is_new_build IS NULL;
+
+-- example output
+--| year | num_transactions | median_price   |
+--| ---- | ---------------- | -------------- |
+--| 2021 | 1,275,784        | 269,995        |
+--| 2022 | 1,065,950        | 280,000        |
+```
+
+
+**Note**
+
+From my initial analysis, I know that the data is right skewed and contains outliers. I do not have the domain knowledge at the moment to explain these outliers: perhaps some low valued properties are sheds or garages. Perhaps some high valued properties are industrial estates. For v1, rather than exclude these from creating aggregates I have used the whole dataset. 
