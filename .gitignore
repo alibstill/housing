@@ -36,6 +36,9 @@ log/**
 
 # 03_visualisation
 03_visualisation/.credentials/
+03_visualisation/.pg/**
+03_visualisation/.pgadmin/** 
+03_visualisation/.metabase/**
 
 # infrastructure
 infrastructure/.credentials/**
