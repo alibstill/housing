@@ -2,7 +2,7 @@
 
 I created a dashboard using Metabase. For a guided tour of the final dashboard, check out my loom video:
 
-[![Watch the video](https://cdn.loom.com/sessions/thumbnails/01fd4fbae9144aa59688838bbeb6f41e-b2239ee6fad1336a-full-play.gif)](https://www.loom.com/share/01fd4fbae9144aa59688838bbeb6f41e)
+[![Watch the video](https://cdn.loom.com/sessions/thumbnails/c7980272036f474496f2bb08bee83dd3-c1747f9d4dc41e42-full-play.gif)](https://www.loom.com/share/c7980272036f474496f2bb08bee83dd3?sid=8d8101cf-4477-4d5c-b775-ad5b5d5eee3d)
 
 Unfortunately, I was not able to easily extract and [load a configuration file](https://www.metabase.com/docs/latest/configuring-metabase/config-file) on the free version of Metabase so I have included instructions on how to recreate the dashboards manually. 
 

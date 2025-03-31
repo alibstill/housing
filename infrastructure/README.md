@@ -1,6 +1,8 @@
-# Terraform setup
+# Infrastructre
 
-Before setting up terraform, make sure that you have performed the necessary manual setup see [essential_manual_setup](./00_essential_manual_setup.md).
+This folder holds the terraform configuration needed to create the resources required for this project on Google Cloud Platform.
+
+Before setting up terraform, make sure that you have performed the necessary manual Google Cloud setup see [essential_manual_setup](./00_essential_manual_setup.md).
 
 ## Quickstart
 
@@ -29,7 +31,6 @@ Example:
 ```bash
 GOOGLE_APPLICATION_CREDENTIALS=".credentials/tf-dev.json" terraform apply
 ```
-
 
 ## Default Configuration
 
