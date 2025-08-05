@@ -21,6 +21,9 @@ Your should have saved your terraform service account credentials securely local
 # Make sure you are in the correct folder
 cd infrastructure
 
+# If you are using a remote bucket to store config (see essential_manual_setup), you need to expose the GOOGLE_APPLICATION_CREDENTIALS credentials
+# GOOGLE_APPLICATION_CREDENTIALS="/path/to/terraform-service-account-key.json" terraform init
+
 terraform init
 
 # Create infrastructure on google cloud
