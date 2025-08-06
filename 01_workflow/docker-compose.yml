@@ -26,7 +26,7 @@ services:
     # Our base image runs without root, but the Docker Compose implementation needs root to access the Docker socket
     # To run Kestra in a rootless mode in production, see: https://kestra.io/docs/installation/podman-compose
     user: "root"
-    command: server standalone 
+    command: server standalone
     volumes:
       - ./kestra-data:/app/storage
       - /var/run/docker.sock:/var/run/docker.sock
@@ -52,7 +52,7 @@ services:
             basicAuth:
               enabled: false
               username: "admin@kestra.io" # it must be a valid email address
-              password: kestra
+              password: Kestra1234!
           repository:
             type: postgres
           storage:
