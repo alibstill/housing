@@ -11,6 +11,7 @@ log/**
 
 # 00_analysis
 00_analysis/data/pp-2015.csv
+00_analysis/data/temp/
 
 # 01_workflow
 01_workflow/.env
