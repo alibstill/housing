@@ -16,5 +16,7 @@ class Metadata:
             "columns": list(self.columns.keys()),
         }
 
-    def get_column_dtypes(self) -> dict[str,str]:
-        return { col_name: col_info["type"] for col_name, col_info in self.columns.items() }
+    def get_column_dtypes(self) -> dict[str, str]:
+        return {
+            col_name: col_info["type"] for col_name, col_info in self.columns.items()
+        }

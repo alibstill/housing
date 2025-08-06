@@ -1,11 +1,8 @@
-import pytest
 from unittest import TestCase
 from src.metadata import Metadata, metadata_mapper
-from src.metadata import price_paid
 
 
 class TestMetadata(TestCase):
-
     def setUp(self):
         self.metadata = Metadata(
             title="EPC",

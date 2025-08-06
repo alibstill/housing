@@ -48,13 +48,12 @@ class TestProcessCsv:
             is_kestra=False,
             data_title="price_paid",
         )
-        # TODO: test that you're getting the parquet with the hash
 
         df = pd.read_parquet(self.temp_folder / "clean.parquet")
 
         assert len(df.columns) == 17
         parquet_file = pq.read_schema(self.temp_folder / "clean.parquet")
         expected_schema = get_schema()
-        assert (
-            parquet_file == expected_schema
-        ), f"Expected schema: {expected_schema}, but got: {parquet_file.schema}"
+        assert parquet_file == expected_schema, (
+            f"Expected schema: {expected_schema}, but got: {parquet_file.schema}"
+        )

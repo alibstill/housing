@@ -64,7 +64,6 @@ def test_logger():
 
 
 class TestPricePaidTransformer:
-
     def test_full_transformer(self, test_logger: logging.Logger) -> None:
         valid_a = get_data(transaction_uid="1")
         invalid_id = get_data()

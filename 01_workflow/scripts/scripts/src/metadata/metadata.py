@@ -46,7 +46,10 @@ price_paid = Metadata(
             "type": "string",
             "description": "An additional description of address location if there is more than one paon/street name in the same town/city",
         },
-        "town_city": {"type": "string", "description": "The town or city of the property"},
+        "town_city": {
+            "type": "string",
+            "description": "The town or city of the property",
+        },
         "district": {
             "type": "string",
             "description": "An additional description of address location. A subdivision of a county",
