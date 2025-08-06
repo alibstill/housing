@@ -5,7 +5,7 @@ WITH raw_price_paid AS (
 SELECT 
    CAST(transaction_uid AS STRING) AS transaction_uid,
    CAST(price AS INT64) AS price,
-   CAST(LEFT(date_of_transfer, 10) AS DATE) As date_of_transfer, --BQ does not support \d
+   CAST(date_of_transfer AS DATE) As date_of_transfer, 
    CAST(postcode AS STRING) AS postcode,
    CAST(property_type AS STRING) AS property_type,
    CAST(is_new_build AS STRING) AS is_new_build,
