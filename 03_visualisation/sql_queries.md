@@ -93,7 +93,7 @@ ORDER BY year;
 
 **Visualization**: Line
 
-**Visualization Cog**: Make sure the X-axis is `year` and the Y-axis is `median_price`. Then add another series (property_type_name) to show median price by property_type.
+**Visualization Cog**: Make sure the X-axis is `year` and the Y-axis is `median_price`. Then add a series breakout (property_type_name) to show median price by property_type.
 
 
 ## Location/ by county dashboard
